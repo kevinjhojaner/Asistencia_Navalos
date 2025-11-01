@@ -1,0 +1,71 @@
+// backend-asistencia/prisma/schema.prisma
+
+// 1. Configuración del Cliente de Prisma
+generator client {
+  provider = "prisma-client-js"
+}
+
+// 2. Configuración de la Base de Datos
+// Esto le dice a Prisma que use PostgreSQL y que encuentre la URL
+// en el archivo .env que ya configuramos.
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// 3. --- MODELOS DE DATOS ---
+
+// Modelo para los Usuarios
+model User {
+  id        String   @id @default(uuid()) // ID único (ej. "abc-123-def-456")
+  username  String   @unique // El nombre de usuario para login
+  password  String   // La contraseña *encriptada*
+  name      String   // Nombre completo (ej. "Kevin Jhojaner")
+  role      Role     @default(EMPLOYEE) // El rol: EMPLOYEE o ADMIN
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relaciones
+  attendanceRecords AttendanceRecord[] // Un usuario puede tener muchos registros de asistencia
+  leaveRequests     LeaveRequest[]     // Un usuario puede tener muchas solicitudes
+}
+
+// Modelo para los Registros de Asistencia
+model AttendanceRecord {
+  id        String   @id @default(uuid())
+  clockIn   DateTime @default(now()) // Hora de entrada
+  clockOut  DateTime? // Hora de salida (opcional, '?' significa que puede estar vacío)
+  status    String   // Estado (ej. "A Tiempo", "Tarde", "Ausente")
+  createdAt DateTime @default(now())
+
+  // Relación: Este registro pertenece a un Usuario
+  user   User   @relation(fields: [userId], references: [id])
+  userId String // Clave foránea que enlaza con User.id
+}
+
+// Modelo para las Solicitudes de Ausencia
+model LeaveRequest {
+  id        String   @id @default(uuid())
+  type      String   // Tipo (ej. "Vacaciones", "Enfermedad")
+  startDate DateTime
+  endDate   DateTime
+  reason    String
+  status    RequestStatus @default(PENDING) // Estado: PENDING, APPROVED, REJECTED
+  createdAt DateTime @default(now())
+
+  // Relación: Esta solicitud pertenece a un Usuario
+  user   User   @relation(fields: [userId], references: [id])
+  userId String // Clave foránea que enlaza con User.id
+}
+
+// Tipos Enumerados (Valores permitidos para ciertos campos)
+enum Role {
+  EMPLOYEE
+  ADMIN
+}
+
+enum RequestStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}

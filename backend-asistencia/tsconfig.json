@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    /* Opciones Base */
+    "target": "ES2020",             // JavaScript moderno
+    "module": "CommonJS",          // ¡LA CLAVE! Usa el sistema de módulos de Node.js
+    "outDir": "./dist",            // Dónde guardar el JS compilado
+    "rootDir": "./src",            // Dónde está tu código TS
+    "strict": true,                // Buenas prácticas
+    "esModuleInterop": true,       // Para compatibilidad con 'import'
+    "skipLibCheck": true,          // No revisar tipos de librerías
+    "moduleResolution": "Node",    // ¡LA CLAVE! Cómo Node.js busca módulos
+    "forceConsistentCasingInFileNames": true
+  },
+  "include": ["src/**/*"],         // Qué carpetas compilar
+  "exclude": ["node_modules", "dist"] // Qué carpetas ignorar
+}
